@@ -5,6 +5,7 @@
 #include <string>
 #include <Windows.h>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 // paciente
@@ -19,14 +20,26 @@ public:
         : nombre(nombre), id(id), fechaIngreso(fechaIngreso) {
     }
 
-    //  información del paciente
-    void informacionPaciente() {
-        cout << "Paciente: " << nombre << endl;
-        cout << "ID: " << id << endl;
-        cout << "Fecha de Ingreso: " << fechaIngreso << endl;
+    // acciones
+    void altaPaciente(string historial) {
+        historialClinico.push_back(historial);
+        cout << "Paciente " << nombre << " dado de alta." << endl;
     }
 
-    // acciones
+    void bajaPaciente() {
+        cout << "Paciente " << nombre << " con ID " << id << " dado de baja." << endl;
+    }
+
+    void modificarDatos(string nuevoNombre) {
+        nombre = nuevoNombre;
+        cout << "Datos del paciente actualizados a: " << nombre << endl;
+    }
+
+    void agregarHistorial(string registro) {
+        historialClinico.push_back(registro);
+        cout << "Registro agregado al historial de " << nombre << "." << endl;
+    }
+
 };
 
 // medico
@@ -41,15 +54,24 @@ public:
         : nombre(nombre), id(id), especialidad(especialidad), disponibilidad(disponibilidad) {
     }
 
-    // información del medico
-    void informacionMedico() {
-        cout << "Medico: " << nombre << endl;
-        cout << "ID: " << id << endl;
-        cout << "Especialidad: " << especialidad << endl;
-        cout << "Disponibilidad: " << (disponibilidad ? "Si" : "No") << endl;
+    // acciones
+    void altaMedico() {
+        cout << "Médico " << nombre << " registrado con ID " << id << "." << endl;
     }
 
-    // acciones
+    void bajaMedico() {
+        cout << "Médico " << nombre << " eliminado del sistema." << endl;
+    }
+
+    void asignarEspecialidad(string nuevaEspecialidad) {
+        especialidad = nuevaEspecialidad;
+        cout << "Especialidad de " << nombre << " actualizada a " << especialidad << "." << endl;
+    }
+
+    void listarMedicos() const {
+        cout << "Médico: " << nombre << ", Especialidad: " << especialidad
+            << ", Disponibilidad: " << (disponibilidad ? "Disponible" : "No disponible") << endl;
+    }
 };
 
 // cita
@@ -66,6 +88,32 @@ public:
     }
 
     // acciones
+    void asignarCita() {
+        cout << "Cita asignada entre " << paciente->nombre << " y " << medico->nombre
+            << " el " << fecha << " con urgencia nivel " << urgencia << "." << endl;
+    }
+
+    void cancelarCita() {
+        cout << "Cita cancelada entre " << paciente->nombre << " y " << medico->nombre << "." << endl;
+    }
+
+    void modificarCita(string nuevaFecha, int nuevaUrgencia) {
+        fecha = nuevaFecha;
+        urgencia = nuevaUrgencia;
+        cout << "Cita modificada para el " << fecha << " con urgencia nivel " << urgencia << "." << endl;
+    }
+
+    static void ordenarPorFecha(vector<Cita>& citas) {
+        sort(citas.begin(), citas.end(), [](Cita& a, Cita& b) {
+            return a.fecha < b.fecha;
+            });
+    }
+
+    static void ordenarPorUrgencia(vector<Cita>& citas) {
+        sort(citas.begin(), citas.end(), [](Cita& a, Cita& b) {
+            return a.urgencia > b.urgencia;
+            });
+    }
 };
 
 // servicio
@@ -80,27 +128,13 @@ public:
     }
 
     // acciones
+    void listarServicios() const {
+        cout << "Servicio: " << servicio << ", Costo: $" << costo
+            << ", Descripción: " << descripcion << endl;
+    }
 };
 
 // clase archivos!
 
 
-int main() {
-
-    // ejemplo para compilar
-
-    Paciente p1("Raquel Gonzalez", 12345, "15-3-2008");
-    Medico m1("Dra. Hugo Sanchez", 1001, "Pediatria", true);
-
-    cout << "Datos del paciente:" << endl;
-    p1.informacionPaciente();
-
-    cout << endl;
-
-    cout << "Datos del medico:" << endl;
-    m1.informacionMedico();
-
-
-
-    return 0;
-}
+int main() {}
