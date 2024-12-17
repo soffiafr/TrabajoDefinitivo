@@ -23,23 +23,28 @@ public:
     // acciones
     void altaPaciente(string historial) {
         this->historialClinico.push_back(historial);
-        cout << "Paciente, " << this->nombre << ", dado de alta." << endl;
     }
 
     void bajaPaciente() {
-        cout << "Paciente, " << this->nombre << ", con ID " << this->id << ", dado de baja." << endl;
+        nombre = "Paciente eliminado";
     }
 
     void modificarDatos(string nuevoNombre) {
         this->nombre = nuevoNombre;
-        cout << "Datos del paciente actualizados a: " << this->nombre << endl;
     }
 
     void agregarHistorial(string registro) {
         this->historialClinico.push_back(registro);
-        cout << "Registro agregado al historial de " << this->nombre << "." << endl;
     }
 
+    void leerPaciente() {
+        cout << "Paciente: " << nombre << ", ID: " << id << ", fecha de ingreso: " << fechaIngreso << endl;
+        cout << "Historial clinico: ";
+        for (const auto& h : historialClinico) {
+            cout << h << ", ";
+        }
+        cout << endl;
+    }
 };
 
 // medico
@@ -55,22 +60,26 @@ public:
     }
 
     // acciones
-    void altaMedico() {
-        cout << "Medico, " << this->nombre << ", registrado con ID " << this->id << "." << endl;
+    void altaMedico(vector<Medico>& medicos) {
+        medicos.push_back(*this);
+        cout << "Medico " << this->nombre << " dado de alta con ID " << this->id << "." << endl;
     }
 
     void bajaMedico() {
-        cout << "Medico, " << this->nombre << ", eliminado del sistema." << endl;
+        nombre = "Medico eliminado";
     }
 
     void asignarEspecialidad(string nuevaEspecialidad) {
         especialidad = nuevaEspecialidad;
-        cout << "Especialidad de " << this->nombre << " actualizada a " << this->especialidad << "." << endl;
     }
 
     void listarMedicos() const {
-        cout << "Medico: " << this->nombre << ", Especialidad: " << this->especialidad
-            << ", Disponibilidad: " << (this->disponibilidad ? "Disponible" : "No disponible") << endl;
+        cout << "Medico: " << nombre << ", especialidad: " << especialidad
+            << ", disponibilidad: " << (disponibilidad ? "Disponible" : "No disponible") << endl;
+    }
+
+    void leerMedico() {
+        cout << "Medico: " << nombre << ", ID: " << id << ", especialidad: " << especialidad << endl;
     }
 };
 
@@ -89,18 +98,22 @@ public:
 
     // acciones
     void asignarCita() {
-        cout << "Cita asignada entre " << this->paciente->nombre << " y " << this->medico->nombre
-            << " el " << this->fecha << " con urgencia nivel " << this->urgencia << "." << endl;
+        cout << "Cita asignada entre " << paciente->nombre << " y " << medico->nombre
+            << " el " << fecha << " con urgencia nivel " << urgencia << "." << endl;
     }
 
     void cancelarCita() {
-        cout << "Cita cancelada entre " << this->paciente->nombre << " y " << this->medico->nombre << "." << endl;
+        cout << "Cita cancelada entre " << paciente->nombre << " y " << medico->nombre << "." << endl;
     }
 
     void modificarCita(string nuevaFecha, int nuevaUrgencia) {
-        this->fecha = nuevaFecha;
-        this->urgencia = nuevaUrgencia;
-        cout << "Cita modificada para el " << this->fecha << " con urgencia nivel " << urgencia << "." << endl;
+        fecha = nuevaFecha;
+        urgencia = nuevaUrgencia;
+    }
+
+    void leerCita() {
+        cout << "Cita ID: " << id << " entre " << paciente->nombre << " y " << medico->nombre
+            << ", fecha: " << fecha << ", urgencia: " << urgencia << endl;
     }
 
     static void ordenarPorFecha(vector<Cita>& citas) {
@@ -131,25 +144,58 @@ public:
 
     // acciones
     void listarServicios() const {
-        cout << "Servicio: " << this->servicio << ", costo: $" << this->costo
-            << ", descripcion: " << this->descripcion << endl;
+        cout << "Servicio: " << servicio << ", costo: $" << costo
+            << ", descripcion: " << descripcion << endl;
+    }
+
+    void leerServicio() const {
+        cout << "Servicio: " << servicio << ", costo: " << costo << ", descripción: " << descripcion << endl;
     }
 };
 
 
 int main() {
 
+    vector<Paciente> pacientes;
+    vector<Medico> medicos;
+    vector<Cita> citas;
+    vector<Servicio> servicios;
+
+        // objetos
         Paciente p1("Lorenzo Perez", 1, "15/03/2017");
         Medico m1("Dra. Sanchez", 1234, "Cardiologia", true);
-
-        p1.altaPaciente("Sin antecedentes.");
-        m1.altaMedico();
-
-        Cita c1(101, &p1, &m1, "6/04/2017", 2);
-        c1.asignarCita();
-
         Servicio s1("Rayos X", 150.75, "Examen radiologico.");
-        s1.listarServicios();
+        pacientes.push_back(p1);
+        medicos.push_back(m1);
+        servicios.push_back(s1);
+
+        // citas
+        Cita c1(101, &pacientes[0], &medicos[0], "6/04/2017", 2);
+        Cita c2(102, &pacientes[0], &medicos[0], "3/04/2017", 1);
+        Cita c3(103, &pacientes[0], &medicos[0], "1/05/2017", 3);
+        citas.push_back(c1);
+        citas.push_back(c2);
+        citas.push_back(c3);
+
+        // leer las citas
+        cout << "Citas:" << endl;
+        for (auto& cita : citas) {
+            cita.leerCita();
+        }
+
+        // ordenar las citas por fecha
+        Cita::ordenarPorFecha(citas);
+        cout << "\nCitas ordenadas por fecha:" << endl;
+        for (auto& cita : citas) {
+            cita.leerCita();
+        }
+
+        // ordenar las citas por urgencia
+        Cita::ordenarPorUrgencia(citas);
+        cout << "\nCitas ordenadas por urgencia:" << endl;
+        for (auto& cita : citas) {
+            cita.leerCita();
+        }
 
         return 0;
 }
