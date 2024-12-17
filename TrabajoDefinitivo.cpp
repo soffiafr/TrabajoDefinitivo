@@ -21,20 +21,13 @@ public:
     }
 
     // acciones
-    void altaPaciente(string historial) {
-        this->historialClinico.push_back(historial);
-    }
-
-    void bajaPaciente() {
-        nombre = "Paciente eliminado";
-    }
-
-    void modificarDatos(string nuevoNombre) {
+    void modificarDatos(string nuevoNombre, string nuevaFechaIngreso) {
         this->nombre = nuevoNombre;
+        this->fechaIngreso = nuevaFechaIngreso;
     }
 
     void agregarHistorial(string registro) {
-        this->historialClinico.push_back(registro);
+        historialClinico.push_back(registro);
     }
 
     void leerPaciente() {
@@ -60,26 +53,16 @@ public:
     }
 
     // acciones
-    void altaMedico(vector<Medico>& medicos) {
-        medicos.push_back(*this);
-        cout << "Medico " << this->nombre << " dado de alta con ID " << this->id << "." << endl;
-    }
-
-    void bajaMedico() {
-        nombre = "Medico eliminado";
-    }
-
     void asignarEspecialidad(string nuevaEspecialidad) {
         especialidad = nuevaEspecialidad;
     }
 
-    void listarMedicos() const {
-        cout << "Medico: " << nombre << ", especialidad: " << especialidad
-            << ", disponibilidad: " << (disponibilidad ? "Disponible" : "No disponible") << endl;
+    void cambiarDisponibilidad(bool nuevaDisponibilidad) {
+        disponibilidad = nuevaDisponibilidad;
     }
 
-    void leerMedico() {
-        cout << "Medico: " << nombre << ", ID: " << id << ", especialidad: " << especialidad << endl;
+    const void leerMedico() {
+        cout << "Medico: " << nombre << ", ID: " << id << ", especialidad: " << especialidad << ", disponibilidad: " << (disponibilidad ? "Si" : "No") << endl;
     }
 };
 
@@ -97,21 +80,12 @@ public:
     }
 
     // acciones
-    void asignarCita() {
-        cout << "Cita asignada entre " << paciente->nombre << " y " << medico->nombre
-            << " el " << fecha << " con urgencia nivel " << urgencia << "." << endl;
-    }
-
-    void cancelarCita() {
-        cout << "Cita cancelada entre " << paciente->nombre << " y " << medico->nombre << "." << endl;
-    }
-
     void modificarCita(string nuevaFecha, int nuevaUrgencia) {
         fecha = nuevaFecha;
         urgencia = nuevaUrgencia;
     }
 
-    void leerCita() {
+    const void leerCita() {
         cout << "Cita ID: " << id << " entre " << paciente->nombre << " y " << medico->nombre
             << ", fecha: " << fecha << ", urgencia: " << urgencia << endl;
     }
@@ -143,15 +117,81 @@ public:
     }
 
     // acciones
-    void listarServicios() const {
-        cout << "Servicio: " << servicio << ", costo: $" << costo
-            << ", descripcion: " << descripcion << endl;
-    }
-
     void leerServicio() const {
         cout << "Servicio: " << servicio << ", costo: " << costo << ", descripción: " << descripcion << endl;
     }
 };
+
+// --- funciones principales de las clases ---
+
+// mostrar las opciones principales del programa
+void menu () {
+    cout << "\nGestion del hospital\n";
+    cout << "1. Gestionar pacientes\n";
+    cout << "2. Gestionar medicos\n";
+    cout << "3. Gestionar citas\n";
+    cout << "4. Gestionar servicios\n";
+    cout << "5. Salir\n";
+    cout << "Seleccione una opcion: ";
+}
+
+// crear, leer, actualizar, eliminar y agregar historial a los pacientes
+void gestionarPacientes(vector<Paciente>& pacientes) {
+    int opcion, id;
+    string nombre, fechaIngreso, registro;
+
+    do {
+        cout << "\nGestion de pacientes\n";
+        cout << "1. Crear paciente\n2. Leer pacientes\n3. Actualizar paciente\n4. Eliminar aciente\n5. Agregar historial del paciente\n0. Volver\nOpcion: ";
+        cin >> opcion;
+
+        switch (opcion) {
+        case 1:
+            cout << "Nombre: "; cin >> nombre;
+            cout << "ID: "; cin >> id;
+            cout << "Fecha de ingreso: "; cin >> fechaIngreso;
+            pacientes.push_back(Paciente(nombre, id, fechaIngreso));
+            cout << "Paciente creado correctamente.\n";
+
+            break;
+
+        case 2:
+            for (auto& p : pacientes) p.leerPaciente();
+
+            break;
+
+        case 3:
+            cout << "Modificar datos del paciente: "; cin >> id;
+            for (auto& p : pacientes) {
+                if (p.id == id) {
+                    cout << "Nuevo nombre: "; cin >> nombre;
+                    cout << "Nueva fecha de ingreso: "; cin >> fechaIngreso;
+                    p.modificarDatos(nombre, fechaIngreso);
+                    cout << "Datos actualizados correctamente.\n";
+                }
+            }
+            break;
+
+        case 4:
+            cout << "Eliminar paciente: "; cin >> id;
+            pacientes.erase(remove_if(pacientes.begin(), pacientes.end(),
+                [id](const Paciente& p) { return p.id == id; }), pacientes.end());
+            cout << "Paciente eliminado.\n";
+
+            break;
+
+        case 5:
+            cout << "ID del paciente: "; cin >> id;
+            for (auto& p : pacientes) {
+                if (p.id == id) {
+                    cout << "Agregar historial: "; cin >> registro;
+                    p.agregarHistorial(registro);
+                }
+            }
+            break;
+        }
+    } while (opcion != 0);
+}
 
 
 int main() {
@@ -161,41 +201,19 @@ int main() {
     vector<Cita> citas;
     vector<Servicio> servicios;
 
-        // objetos
-        Paciente p1("Lorenzo Perez", 1, "15/03/2017");
-        Medico m1("Dra. Sanchez", 1234, "Cardiologia", true);
-        Servicio s1("Rayos X", 150.75, "Examen radiologico.");
-        pacientes.push_back(p1);
-        medicos.push_back(m1);
-        servicios.push_back(s1);
-
-        // citas
-        Cita c1(101, &pacientes[0], &medicos[0], "6/04/2017", 2);
-        Cita c2(102, &pacientes[0], &medicos[0], "3/04/2017", 1);
-        Cita c3(103, &pacientes[0], &medicos[0], "1/05/2017", 3);
-        citas.push_back(c1);
-        citas.push_back(c2);
-        citas.push_back(c3);
-
-        // leer las citas
-        cout << "Citas:" << endl;
-        for (auto& cita : citas) {
-            cita.leerCita();
+    int opcion;
+    do {
+        menu();
+        cin >> opcion;
+        switch (opcion) {
+        case 1: gestionarPacientes(pacientes); break;
+        case 2: cout << "Gestion de medicos aun no implementada.\n"; break;
+        case 3: cout << "Gestion de citas aun no implementada.\n"; break;
+        case 4: cout << "Gestion de servicios aun no implementada.\n"; break;
+        case 5: cout << "Saliendo del sistema...\n"; break;
+        default: cout << "Error, opcion invalida.\n";
         }
-
-        // ordenar las citas por fecha
-        Cita::ordenarPorFecha(citas);
-        cout << "\nCitas ordenadas por fecha:" << endl;
-        for (auto& cita : citas) {
-            cita.leerCita();
-        }
-
-        // ordenar las citas por urgencia
-        Cita::ordenarPorUrgencia(citas);
-        cout << "\nCitas ordenadas por urgencia:" << endl;
-        for (auto& cita : citas) {
-            cita.leerCita();
-        }
-
-        return 0;
+    } while (opcion != 5);
+    
+    return 0;
 }
