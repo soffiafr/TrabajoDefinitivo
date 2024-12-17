@@ -393,3 +393,7 @@ int main() {
     
     return 0;
 }
+
+// Todas las clases tienen sus funciones principales y no dan error. He solucionado el problema con el void gestionarCitas.
+// El programa no se puede compilar en mi ordenador por una problema con el archivo .exe, es por eso que no he podido implementar que los datos se guarden. 
+// Falta el guardado de datos.
