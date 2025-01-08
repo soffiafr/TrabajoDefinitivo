@@ -12,7 +12,7 @@ endif()
 project ("TrabajoDefinitivo")
 
 # Agregue un origen al ejecutable de este proyecto.
-add_executable (TrabajoDefinitivo "TrabajoDefinitivo.cpp" "TrabajoDefinitivo.h")
+add_executable (TrabajoDefinitivo "TrabajoDefinitivo.cpp" "TrabajoDefinitivo.h"  "Paciente.h" "Medico.h" "Cita.h" "Servicio.h" "Funciones.h" "Paciente.cpp" "Medico.cpp" "Cita.cpp" "Servicio.cpp" "Funciones.cpp")
 
 if (CMAKE_VERSION VERSION_GREATER 3.12)
   set_property(TARGET TrabajoDefinitivo PROPERTY CXX_STANDARD 20)
