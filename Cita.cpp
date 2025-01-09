@@ -6,6 +6,48 @@ Cita::Cita(int id, Paciente* paciente, Medico* medico, string fecha, int urgenci
     : id(id), paciente(paciente), medico(medico), fecha(fecha), urgencia(urgencia) {
 }
 
+Cita Cita::fromJSON(const nlohmann::json& j, std::vector<Paciente>& pacientes, std::vector<Medico>& medicos) {
+    int id = j["id"];
+    std::string fecha = j["fecha"];
+    int urgencia = j["urgencia"];
+    int pacienteId = j["paciente_id"];
+    int medicoId = j["medico_id"];
+
+    Paciente* paciente = nullptr;
+    for (auto& p : pacientes) {
+        if (p.id == pacienteId) {
+            paciente = &p;
+            break;
+        }
+    }
+
+    Medico* medico = nullptr;
+    for (auto& m : medicos) {
+        if (m.id == medicoId) {
+            medico = &m;
+            break;
+        }
+    }
+
+    if (paciente && medico) {
+        return Cita(id, paciente, medico, fecha, urgencia);
+    }
+    else {
+        throw std::runtime_error("Paciente o médico no encontrado.");
+    }
+}
+
+
+nlohmann::json Cita::toJSON() const {
+    nlohmann::json j;
+    j["id"] = id;
+    j["fecha"] = fecha;
+    j["urgencia"] = urgencia;
+    j["paciente_id"] = paciente->id;
+    j["medico_id"] = medico->id; 
+    return j;
+}
+
 void Cita::modificarCita(string nuevaFecha, int nuevaUrgencia) {
     fecha = nuevaFecha;
     urgencia = nuevaUrgencia;

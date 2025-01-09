@@ -5,7 +5,10 @@
 #include "Servicio.h"
 #include <iostream>
 #include <algorithm>
+#include "json.hpp"
+#include <fstream>
 
+using json = nlohmann::json;
 using namespace std;
 
 void menu() {
@@ -14,7 +17,9 @@ void menu() {
     cout << "2. Gestionar medicos\n";
     cout << "3. Gestionar citas\n";
     cout << "4. Gestionar servicios\n";
-    cout << "5. Salir\n";
+    cout << "5. Exportar datos\n";
+    cout << "6. Importar datos\n";
+    cout << "7. Salir\n";
     cout << "Seleccione una opcion: ";
 }
 
@@ -24,7 +29,7 @@ void gestionarPacientes(std::vector<Paciente>& pacientes) {
 
     do {
         cout << "\nGestion de pacientes\n";
-        cout << "1. Crear paciente\n2. Leer pacientes\n3. Actualizar paciente\n4. Eliminar aciente\n5. Agregar historial del paciente\n0. Volver\nOpcion: ";
+        cout << "1. Crear paciente\n2. Leer pacientes\n3. Actualizar paciente\n4. Eliminar paciente\n5. Agregar historial del paciente\n0. Volver\nOpcion: ";
         cin >> opcion;
 
         switch (opcion) {
@@ -292,3 +297,67 @@ void gestionarServicios(vector<Servicio>& servicios, vector<Paciente>& pacientes
             }
         } while (opcion != 0);
     }
+
+// exportar datos a json
+void exportarDatosJSON(const std::vector<Paciente>& pacientes, const std::vector<Medico>& medicos, const std::vector<Cita>& citas, const std::vector<Servicio>& servicios, const std::string& archivo) {
+    json j;
+
+    for (const auto& p : pacientes) {
+        j["pacientes"].push_back(p.toJSON());
+    }
+
+    for (const auto& m : medicos) {
+        j["medicos"].push_back(m.toJSON());
+    }
+
+    for (const auto& c : citas) {
+        j["citas"].push_back(c.toJSON());
+    }
+
+    for (const auto& s : servicios) {
+        j["servicios"].push_back(s.toJSON());
+    }
+
+    // guardar datos
+    std::ofstream archivoSalida(archivo);
+    if (archivoSalida.is_open()) {
+        archivoSalida << j.dump(4);
+        archivoSalida.close();
+        std::cout << "Datos exportados correctamente a " << archivo << "\n";
+    }
+    else {
+        std::cerr << "No se pudo abrir el archivo para exportar los datos.\n";
+    }
+}
+
+// importar datos desde json
+void importarDatosJSON(std::vector<Paciente>& pacientes, std::vector<Medico>& medicos, std::vector<Cita>& citas, std::vector<Servicio>& servicios, const std::string& archivo) {
+    std::ifstream archivoEntrada(archivo);
+    if (!archivoEntrada.is_open()) {
+        std::cerr << "No se pudo abrir el archivo para importar los datos.\n";
+        return;
+    }
+
+    json j;
+    archivoEntrada >> j;
+
+    // limpiar datos
+    pacientes.clear();
+    medicos.clear();
+    citas.clear();
+    servicios.clear();
+
+    for (const auto& p : j["pacientes"]) {
+        pacientes.push_back(Paciente::fromJSON(p));
+    }
+
+    for (const auto& c : j["citas"]) {
+        citas.push_back(Cita::fromJSON(c, pacientes, medicos));
+    }
+
+    for (const auto& s : j["servicios"]) {
+        servicios.push_back(Servicio::fromJSON(s));
+    }
+
+    std::cout << "Datos importados correctamente desde " << archivo << "\n";
+}
