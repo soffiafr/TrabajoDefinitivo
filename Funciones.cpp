@@ -331,15 +331,27 @@ void exportarDatosJSON(const std::vector<Paciente>& pacientes, const std::vector
 }
 
 // importar datos desde json
-void importarDatosJSON(std::vector<Paciente>& pacientes, std::vector<Medico>& medicos, std::vector<Cita>& citas, std::vector<Servicio>& servicios, const std::string& archivo) {
+void importarDatosJSON(
+    std::vector<Paciente>& pacientes,
+    std::vector<Medico>& medicos,
+    std::vector<Cita>& citas,
+    std::vector<Servicio>& servicios,
+    const std::string& archivo)
+{
     std::ifstream archivoEntrada(archivo);
     if (!archivoEntrada.is_open()) {
-        std::cerr << "No se pudo abrir el archivo para importar los datos.\n";
+        std::cerr << "Error: No se pudo abrir el archivo para importar los datos.\n";
         return;
     }
 
     json j;
-    archivoEntrada >> j;
+    try {
+        archivoEntrada >> j;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error al leer el archivo: " << e.what() << "\n";
+        return;
+    }
 
     // limpiar datos
     pacientes.clear();
@@ -347,17 +359,54 @@ void importarDatosJSON(std::vector<Paciente>& pacientes, std::vector<Medico>& me
     citas.clear();
     servicios.clear();
 
-    for (const auto& p : j["pacientes"]) {
-        pacientes.push_back(Paciente::fromJSON(p));
+    // importar clases
+    // pacientes
+    if (j.contains("pacientes")) {
+        for (const auto& p : j["pacientes"]) {
+            try {
+                pacientes.push_back(Paciente::fromJSON(p));
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Error al importar paciente: " << e.what() << "\n";
+            }
+        }
     }
 
-    for (const auto& c : j["citas"]) {
-        citas.push_back(Cita::fromJSON(c, pacientes, medicos));
+    // medicos
+    if (j.contains("medicos")) {
+        for (const auto& m : j["medicos"]) {
+            try {
+                medicos.push_back(Medico::fromJSON(m));
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Error al importar medico: " << e.what() << "\n";
+            }
+        }
     }
 
-    for (const auto& s : j["servicios"]) {
-        servicios.push_back(Servicio::fromJSON(s));
+    // servicios
+    if (j.contains("servicios")) {
+        for (const auto& s : j["servicios"]) {
+            try {
+                servicios.push_back(Servicio::fromJSON(s));
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Error al importar servicio: " << e.what() << "\n";
+            }
+        }
     }
 
-    std::cout << "Datos importados correctamente desde " << archivo << "\n";
+    // citas
+    if (j.contains("citas")) {
+        for (const auto& c : j["citas"]) {
+            try {
+                citas.push_back(Cita::fromJSON(c, pacientes, medicos));
+            }
+            catch (const std::exception& e) {
+                std::cerr << "Error al importar cita: " << e.what() << "\n";
+            }
+        }
+    }
+
+    std::cout << "Datos importados correctamente desde " << archivo << ".\n";
 }
