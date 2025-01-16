@@ -65,3 +65,13 @@ void Cita::ordenarPorFecha(vector<Cita>& citas) {
 void Cita::ordenarPorUrgencia(vector<Cita>& citas) {
     sort(citas.begin(), citas.end(), [](Cita& a, Cita& b) { return a.urgencia > b.urgencia; });
 }
+
+bool Cita::validarDisponibilidadMedico(const Medico* medico, const string& fecha, const vector<Cita>& citas) {
+    for (const auto& cita : citas) {
+        if (cita.medico == medico && cita.fecha == fecha) {
+            cout << "El médico " << medico->nombre << " ya tiene una cita programada para la fecha " << fecha << ".\n";
+            return false;
+        }
+    }
+    return true;
+}

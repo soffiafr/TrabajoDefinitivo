@@ -174,18 +174,38 @@ void gestionarCitas(std::vector<Cita>& citas, std::vector<Paciente>& pacientes, 
             }
 
             if (paciente && medico) {
-                citas.push_back(Cita(citas.size() + 1, paciente, medico, fecha, urgencia));
-                cout << "Cita creada correctamente.\n";
+                if (medico->disponibilidad) {
+                    citas.push_back(Cita(citas.size() + 1, paciente, medico, fecha, urgencia));
+                    cout << "Cita creada correctamente.\n";
+                }
+                else {
+                    cout << "Medico no disponible.\n";
+                }
             }
             else {
                 cout << "Paciente o medico no encontrado.\n";
             }
             break;
         }
-        case 2:
-            for (auto& c : citas) c.leerCita();
-            break;
+        case 2: {
+            int subopcion;
+            cout << "1. Citas ordenadas por fecha\n2. Citas ordenadas por urgencia\n3. Mostrar sin ordenar\nOpcion: ";
+            cin >> subopcion;
 
+            if (subopcion == 1) {
+                Cita::ordenarPorFecha(citas);
+                cout << "Citas ordenadas por fecha:\n";
+            }
+            else if (subopcion == 2) {
+                Cita::ordenarPorUrgencia(citas);
+                cout << "Citas ordenadas por urgencia:\n";
+            }
+
+            for (auto& c : citas) {
+                c.leerCita();
+            }
+            break;
+        }
         case 3: {
             cout << "ID de la cita: "; cin >> id;
             bool citaEncontrada = false;

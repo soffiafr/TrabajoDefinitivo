@@ -25,6 +25,7 @@ public:
     void leerCita() const;
     static void ordenarPorFecha(vector<Cita>& citas);
     static void ordenarPorUrgencia(vector<Cita>& citas);
+    static bool validarDisponibilidadMedico(const Medico* medico, const string& fecha, const vector<Cita>& citas);
 };
 
 #endif
