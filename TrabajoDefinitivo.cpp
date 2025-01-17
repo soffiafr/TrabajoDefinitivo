@@ -23,12 +23,13 @@ int main() {
         case 2: gestionarMedicos(medicos); break;
         case 3: gestionarCitas(citas, pacientes, medicos); break;
         case 4: gestionarServicios(servicios, pacientes, medicos); break;
-        case 5: exportarDatosJSON(pacientes, medicos, citas, servicios, "hospital.json"); break;
-        case 6: importarDatosJSON(pacientes, medicos, citas, servicios, "hospital.json"); break;
-        case 7: cout << "Saliendo del sistema...\n"; break;
+        case 5: generarReportes(citas, pacientes, medicos); break;
+        case 6: exportarDatosJSON(pacientes, medicos, citas, servicios, "hospital.json"); break;
+        case 7: importarDatosJSON(pacientes, medicos, citas, servicios, "hospital.json"); break;
+        case 8: cout << "Saliendo del sistema...\n"; break;
         default: cout << "Error, opcion invalida.\n";
         }
-    } while (opcion != 7);
+    } while (opcion != 8);
 
     return 0;
 }

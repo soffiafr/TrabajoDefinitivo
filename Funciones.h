@@ -12,6 +12,7 @@ void gestionarPacientes(vector<Paciente>& pacientes);
 void gestionarMedicos(vector<Medico>& medicos);
 void gestionarCitas(vector<Cita>& citas, vector<Paciente>& pacientes, vector<Medico>& medicos);
 void gestionarServicios(vector<Servicio>& servicios, vector<Paciente>& pacientes, vector<Medico>& medicos);
+void generarReportes(const std::vector<Cita>& citas, const std::vector<Paciente>& pacientes, const std::vector<Medico>& medicos);
 
 // json
 void exportarDatosJSON(const std::vector<Paciente>& pacientes, const std::vector<Medico>& medicos, const std::vector<Cita>& citas, const std::vector<Servicio>& servicios, const std::string& archivo);

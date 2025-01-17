@@ -17,15 +17,17 @@ void menu() {
     cout << "2. Gestionar medicos\n";
     cout << "3. Gestionar citas\n";
     cout << "4. Gestionar servicios\n";
-    cout << "5. Exportar datos\n";
-    cout << "6. Importar datos\n";
-    cout << "7. Salir\n";
+    cout << "5. Generar reportes\n";
+    cout << "6. Exportar datos\n";
+    cout << "7. Importar datos\n";
+    cout << "8. Salir\n";
     cout << "Seleccione una opcion: ";
 }
 
 void gestionarPacientes(std::vector<Paciente>& pacientes) {
     int opcion, id;
     string nombre, fechaIngreso, registro;
+    bool enfermedadCronica;
 
     do {
         cout << "\nGestion de pacientes\n";
@@ -36,8 +38,9 @@ void gestionarPacientes(std::vector<Paciente>& pacientes) {
         case 1:
             cout << "Nombre: "; cin >> nombre;
             cout << "ID: "; cin >> id;
-            cout << "Fecha de ingreso: "; cin >> fechaIngreso;
-            pacientes.push_back(Paciente(nombre, id, fechaIngreso));
+            cout << "Fecha de ingreso (YYYY-MM-DD): "; cin >> fechaIngreso;
+            cout << "¿Tiene alguna enfermedad cronica? Pulse 1 para si o 0 para no): "; cin >> enfermedadCronica;
+            pacientes.push_back(Paciente(nombre, id, fechaIngreso, enfermedadCronica));
             cout << "Paciente creado correctamente.\n";
 
             break;
@@ -52,8 +55,9 @@ void gestionarPacientes(std::vector<Paciente>& pacientes) {
             for (auto& p : pacientes) {
                 if (p.id == id) {
                     cout << "Nuevo nombre: "; cin >> nombre;
-                    cout << "Nueva fecha de ingreso: "; cin >> fechaIngreso;
-                    p.modificarDatos(nombre, fechaIngreso);
+                    cout << "Nueva fecha de ingreso (YYYY-MM-DD): "; cin >> fechaIngreso;
+                    cout << "Nueva enfermedad: "; cin >> enfermedadCronica;
+                    p.modificarDatos(nombre, fechaIngreso, enfermedadCronica);
                     cout << "Datos actualizados correctamente.\n";
                 }
             }
@@ -160,7 +164,7 @@ void gestionarCitas(std::vector<Cita>& citas, std::vector<Paciente>& pacientes, 
         case 1: {
             cout << "ID de paciente: "; cin >> pacienteId;
             cout << "ID de medico: "; cin >> medicoId;
-            cout << "Fecha: "; cin >> fecha;
+            cout << "Fecha (YYYY-MM-DD): "; cin >> fecha;
             cout << "Urgencia (1 a 5): "; cin >> urgencia;
 
             Paciente* paciente = nullptr;
@@ -211,8 +215,8 @@ void gestionarCitas(std::vector<Cita>& citas, std::vector<Paciente>& pacientes, 
             bool citaEncontrada = false;
             for (auto& c : citas) {
                 if (c.id == id) {
-                    cout << "Nueva fecha: "; cin >> fecha;
-                    cout << "Nueva urgencia: "; cin >> urgencia;
+                    cout << "Nueva fecha (YYYY-MM-DD): "; cin >> fecha;
+                    cout << "Nueva urgencia (1 a 5): "; cin >> urgencia;
                     c.modificarCita(fecha, urgencia);
                     cout << "Cita modificada correctamente.\n";
                     citaEncontrada = true;
@@ -315,6 +319,71 @@ void gestionarServicios(vector<Servicio>& servicios, vector<Paciente>& pacientes
 
             break;
             }
+        } while (opcion != 0);
+    }
+
+void generarReportes(const std::vector<Cita>& citas, const std::vector<Paciente>& pacientes, const std::vector<Medico>& medicos) {
+    int opcion;
+
+    do {
+        cout << "\nReportes disponibles:\n";
+        cout << "1. Listado de pacientes atendidos en un rango de fechas\n2. Citas pendientes por medico o especialidad\n3. Reporte de pacientes con enfermedades cronicas\n0. Volver\nOpcion: ";
+        cin >> opcion;
+
+        switch (opcion) {
+        case 1: {
+            string fechaInicio, fechaFin;
+            cout << "Fecha de inicio (YYYY-MM-DD): ";
+            cin >> fechaInicio;
+            cout << "Fecha de fin (YYYY-MM-DD): ";
+            cin >> fechaFin;
+
+            cout << "\nPacientes atendidos entre " << fechaInicio << " y " << fechaFin << ":\n";
+            for (const auto& cita : citas) {
+                if (cita.fecha >= fechaInicio && cita.fecha <= fechaFin) {
+                    cout << "- " << cita.paciente->nombre << " (ID: " << cita.paciente->id << ")\n";
+                }
+            }
+            break;
+        }
+        case 2: {
+            int medicoId;
+            cout << "ID del medico o ingrese -1 para listar por especialidad: ";
+            cin >> medicoId;
+
+            if (medicoId != -1) {
+                cout << "\nCitas pendientes para el medico con ID " << medicoId << ":\n";
+                for (const auto& cita : citas) {
+                    if (cita.medico->id == medicoId) {
+                        cout << "- Paciente: " << cita.paciente->nombre << ", fecha: " << cita.fecha << ", urgencia: " << cita.urgencia << "\n";
+                    }
+                }
+            }
+            else {
+                string especialidad;
+                cout << "Ingrese la especialidad: ";
+                cin.ignore();
+                getline(cin, especialidad);
+
+                cout << "\nCitas pendientes para la especialidad " << especialidad << ":\n";
+                for (const auto& cita : citas) {
+                    if (cita.medico->especialidad == especialidad) {
+                        cout << "- Paciente: " << cita.paciente->nombre << ", medico: " << cita.medico->nombre << ", fecha: " << cita.fecha << "\n";
+                    }
+                }
+            }
+            break;
+        }
+        case 3: {
+            cout << "\nPacientes con enfermedades cronicas:\n";
+            for (const auto& paciente : pacientes) {
+                if (paciente.enfermedadCronica) {
+                    cout << "- " << paciente.nombre << " (ID: " << paciente.id << ")\n";
+                }
+            }
+            break;
+        }
+        }
         } while (opcion != 0);
     }
 
