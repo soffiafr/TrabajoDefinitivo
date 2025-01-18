@@ -25,11 +25,15 @@ int main() {
         case 4: gestionarServicios(servicios, pacientes, medicos); break;
         case 5: generarReportes(citas, pacientes, medicos); break;
         case 6: exportarDatosJSON(pacientes, medicos, citas, servicios, "hospital.json"); break;
-        case 7: importarDatosJSON(pacientes, medicos, citas, servicios, "hospital.json"); break;
-        case 8: cout << "Saliendo del sistema...\n"; break;
+        case 7: importarDatosJSON(pacientes, medicos, citas, servicios); break;
+        case 8: {
+            string nombreArchivoOriginal = "hospital.json";
+            realizarBackup(nombreArchivoOriginal); break;
+        }
+        case 9: cout << "Saliendo del sistema...\n"; break;
         default: cout << "Error, opcion invalida.\n";
         }
-    } while (opcion != 8);
+    } while (opcion != 9);
 
     return 0;
 }

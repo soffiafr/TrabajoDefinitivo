@@ -20,7 +20,8 @@ void menu() {
     cout << "5. Generar reportes\n";
     cout << "6. Exportar datos\n";
     cout << "7. Importar datos\n";
-    cout << "8. Salir\n";
+    cout << "8. Realizar backup\n";
+    cout << "9. Salir\n";
     cout << "Seleccione una opcion: ";
 }
 
@@ -389,6 +390,7 @@ void generarReportes(const std::vector<Cita>& citas, const std::vector<Paciente>
 
 // exportar datos a json
 void exportarDatosJSON(const std::vector<Paciente>& pacientes, const std::vector<Medico>& medicos, const std::vector<Cita>& citas, const std::vector<Servicio>& servicios, const std::string& archivo) {
+    
     json j;
 
     for (const auto& p : pacientes) {
@@ -424,9 +426,55 @@ void importarDatosJSON(
     std::vector<Paciente>& pacientes,
     std::vector<Medico>& medicos,
     std::vector<Cita>& citas,
-    std::vector<Servicio>& servicios,
-    const std::string& archivo)
+    std::vector<Servicio>& servicios)
+
 {
+    int opcion;
+    std::string archivo;
+
+    std::cout << "Seleccione la fuente de datos a importar\n1. Importar desde hospital.json\n2. Importar desde un archivo de backup\n";
+    std::cout << "Opcion: ";
+    std::cin >> opcion;
+
+    if (opcion == 1) {
+        archivo = "hospital.json";
+    }
+    else if (opcion == 2) {
+        
+        // archivos en la carpeta backup
+        std::vector<std::string> archivosBackup;
+        for (const auto& entry : std::filesystem::directory_iterator("backups")) {
+            if (entry.is_regular_file()) {
+                archivosBackup.push_back(entry.path().string());
+            }
+        }
+
+        if (archivosBackup.empty()) {
+            std::cout << "No hay archivos de backup disponibles.\n";
+            return;
+        }
+
+        std::cout << "Archivos de backup disponibles:\n";
+        for (size_t i = 0; i < archivosBackup.size(); ++i) {
+            std::cout << i + 1 << ". " << archivosBackup[i] << "\n";
+        }
+        std::cout << "Seleccione un archivo de backup: ";
+        int seleccion;
+        std::cin >> seleccion;
+
+        if (seleccion > 0 && seleccion <= archivosBackup.size()) {
+            archivo = archivosBackup[seleccion - 1];
+        }
+        else {
+            std::cout << "Opción no válida.\n";
+            return;
+        }
+    }
+    else {
+        std::cout << "Opción no válida.\n";
+        return;
+    }
+
     std::ifstream archivoEntrada(archivo);
     if (!archivoEntrada.is_open()) {
         std::cerr << "Error: No se pudo abrir el archivo para importar los datos.\n";
@@ -498,4 +546,27 @@ void importarDatosJSON(
     }
 
     std::cout << "Datos importados correctamente desde " << archivo << ".\n";
+}
+
+void realizarBackup(const std::string& nombreArchivoOriginal) {
+    try {
+        // crear la carpeta si no existe
+        std::string carpetaBackup = "backups";
+        std::filesystem::create_directory(carpetaBackup);
+
+        // nombre del archivo de backup con fecha y hora
+        std::time_t t = std::time(nullptr);
+        std::tm* now = std::localtime(&t);
+        char timestamp[20];
+        strftime(timestamp, sizeof(timestamp), "%Y-%m-%d_%H-%M-%S", now);
+
+        std::string nombreArchivoBackup = carpetaBackup + "/backup_" + std::string(timestamp) + ".json";
+
+        std::filesystem::copy(nombreArchivoOriginal, nombreArchivoBackup);
+
+        std::cout << "Backup realizado correctamente en: " << nombreArchivoBackup << std::endl;
+    }
+    catch (const std::exception& e) {
+        std::cerr << "Error al realizar el backup: " << e.what() << std::endl;
+    }
 }

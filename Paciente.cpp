@@ -26,10 +26,7 @@ void Paciente::agregarHistorial(string registro) {
 }
 
 void Paciente::leerPaciente() const {
-    cout << "Paciente: " << nombre;
-    cout << ", ID: " << id;
-    cout << ", fecha de ingreso: " << fechaIngreso;
-    cout << ", enfermedad cronica: " << (enfermedadCronica ? "Si" : "No") << endl;
+    cout << "Paciente: " << nombre << ", ID: " << id << ", fecha de ingreso: " << fechaIngreso << ", enfermedad cronica: " << (enfermedadCronica ? "Si" : "No") << endl;
     cout << "Historial clinico: ";
     if (historialClinico.empty()) {
         cout << "No hay registros." << endl;
